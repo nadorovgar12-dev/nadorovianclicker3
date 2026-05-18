@@ -66,6 +66,13 @@
                             required
                         />
                         <input
+                            type="email"
+                            class="auth-input"
+                            id="register-email"
+                            placeholder="Email Address"
+                            required
+                        />
+                        <input
                             type="password"
                             class="auth-input"
                             id="register-password"
@@ -85,6 +92,47 @@
                         <div class="auth-error" id="register-error"></div>
                     </form>
                 </div>
+            </div>
+        </div>
+
+        <!-- Email Verification Modal -->
+        <div class="email-verification-modal hidden" role="dialog" aria-modal="true" aria-labelledby="email-verify-title">
+            <div class="modal-content">
+                <h2 id="email-verify-title">Verify Your Email</h2>
+                <p class="email-verify-message">Enter the 6-digit code we sent to your email</p>
+                <input
+                    type="text"
+                    class="verification-code-input"
+                    id="verification-code-input"
+                    maxlength="6"
+                    placeholder="000000"
+                    inputmode="numeric"
+                />
+                <div class="email-verify-actions">
+                    <button type="button" class="modal-button verify-code-btn">Verify Code</button>
+                    <button type="button" class="modal-button secondary-btn resend-code-btn">Resend Code</button>
+                </div>
+                <div class="verification-error" id="email-verification-error"></div>
+                <div class="verification-timer" id="email-verify-timer"></div>
+            </div>
+        </div>
+
+        <!-- Email Collection Modal (for existing users) -->
+        <div class="email-collection-modal hidden" role="dialog" aria-modal="true" aria-labelledby="email-collect-title">
+            <div class="modal-content">
+                <h2 id="email-collect-title">Update Your Email</h2>
+                <p>We need your email address to continue playing</p>
+                <input
+                    type="email"
+                    class="auth-input"
+                    id="email-collection-input"
+                    placeholder="Enter your email address"
+                    required
+                />
+                <div class="email-collection-actions">
+                    <button type="button" class="modal-button email-collection-submit-btn">Submit Email</button>
+                </div>
+                <div class="email-collection-error" id="email-collection-error"></div>
             </div>
         </div>
 
@@ -736,6 +784,35 @@
                             class="admin-action-group hidden"
                             id="owner-actions"
                         >
+                            <label class="admin-action-item">
+                                <span>Send Email to Player</span>
+                                <div
+                                    style="
+                                        display: flex;
+                                        gap: 5px;
+                                        flex-wrap: wrap;
+                                        flex-direction: column;
+                                    "
+                                >
+                                    <input
+                                        type="text"
+                                        class="admin-email-target"
+                                        placeholder="Player username"
+                                        style="flex: 1; min-width: 180px"
+                                    />
+                                    <textarea
+                                        class="admin-email-message"
+                                        placeholder="Message content"
+                                        style="width: 100%; height: 80px; padding: 8px; border-radius: 4px; font-family: monospace;"
+                                    ></textarea>
+                                    <button
+                                        type="button"
+                                        class="utility-btn admin-send-email-btn"
+                                    >
+                                        📧 Send Email
+                                    </button>
+                                </div>
+                            </label>
                             <label class="admin-action-item">
                                 <span>Target + Coins</span>
                                 <div

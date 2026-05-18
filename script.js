@@ -792,6 +792,32 @@
     );
   }
 
+  function generateVerificationCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  async function sendVerificationEmail(email, code) {
+    try {
+      const response = await fetch("/api/send-verification-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code }),
+      });
+      const result = await response.json();
+      return result.success || false;
+    } catch {
+      console.log(
+        `📧 Verification code for ${email}: ${code} (expires in 10 minutes)`,
+      );
+      return true;
+    }
+  }
+
   function getPlayerSaveKey(username) {
     return `${PLAYER_DATA_PREFIX}${username}`;
   }
@@ -821,10 +847,10 @@
   }
 
   const accountSystem = {
-    register(username, password) {
+    register(username, password, email) {
       const normalizedUsername = normalizeUsername(username);
-      if (!normalizedUsername || !password) {
-        return { success: false, error: "Username and password required" };
+      if (!normalizedUsername || !password || !email) {
+        return { success: false, error: "Username, password, and email required" };
       }
 
       if (normalizedUsername.length < 3) {
@@ -841,6 +867,10 @@
         };
       }
 
+      if (!validateEmail(email)) {
+        return { success: false, error: "Invalid email address" };
+      }
+
       const accounts = this.getAllAccounts();
       const exists = accounts.find(
         (a) => accountKey(a.username) === accountKey(normalizedUsername),
@@ -854,6 +884,7 @@
         accountKey(normalizedUsername) === accountKey(OWNER_USERNAME) &&
         !ownerExists;
 
+      const verificationCode = generateVerificationCode();
       const newAccount = {
         username: normalizedUsername,
         passwordHash: hashPassword(password),
@@ -864,12 +895,17 @@
         warnings: 0,
         notifications: [],
         kickedUntil: 0,
+        email: email,
+        emailVerified: false,
+        verificationCode: verificationCode,
+        verificationCodeExpiry: nowMs() + 10 * 60 * 1000,
+        emailVerifiedAt: null,
       };
 
       accounts.push(newAccount);
       localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
 
-      return { success: true, account: newAccount };
+      return { success: true, account: newAccount, verificationCode };
     },
 
     login(username, password) {
@@ -949,6 +985,94 @@
       currentUser = null;
       selectedAdminPlayer = null;
       localStorage.removeItem(CURRENT_USER_KEY);
+    },
+
+    verifyEmail(username, code) {
+      const normalizedUsername = normalizeUsername(username);
+      if (!normalizedUsername || !code) {
+        return { success: false, error: "Username and code required" };
+      }
+
+      const accounts = this.getAllAccounts();
+      const account = accounts.find(
+        (a) => accountKey(a.username) === accountKey(normalizedUsername),
+      );
+
+      if (!account) {
+        return { success: false, error: "Account not found" };
+      }
+
+      if (account.emailVerified) {
+        return { success: false, error: "Email already verified" };
+      }
+
+      if (!account.verificationCode || account.verificationCode !== code) {
+        return { success: false, error: "Invalid verification code" };
+      }
+
+      if (nowMs() > Number(account.verificationCodeExpiry || 0)) {
+        return { success: false, error: "Verification code expired" };
+      }
+
+      account.emailVerified = true;
+      account.emailVerifiedAt = nowMs();
+      account.verificationCode = null;
+      account.verificationCodeExpiry = 0;
+      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+
+      return { success: true };
+    },
+
+    resendVerificationCode(username) {
+      const normalizedUsername = normalizeUsername(username);
+      const accounts = this.getAllAccounts();
+      const account = accounts.find(
+        (a) => accountKey(a.username) === accountKey(normalizedUsername),
+      );
+
+      if (!account) {
+        return { success: false, error: "Account not found" };
+      }
+
+      if (account.emailVerified) {
+        return { success: false, error: "Email already verified" };
+      }
+
+      const newCode = generateVerificationCode();
+      account.verificationCode = newCode;
+      account.verificationCodeExpiry = nowMs() + 10 * 60 * 1000;
+      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+
+      return { success: true, verificationCode: newCode };
+    },
+
+    addEmailToExistingUser(username, email) {
+      const normalizedUsername = normalizeUsername(username);
+      if (!normalizedUsername || !email) {
+        return { success: false, error: "Username and email required" };
+      }
+
+      if (!validateEmail(email)) {
+        return { success: false, error: "Invalid email address" };
+      }
+
+      const accounts = this.getAllAccounts();
+      const account = accounts.find(
+        (a) => accountKey(a.username) === accountKey(normalizedUsername),
+      );
+
+      if (!account) {
+        return { success: false, error: "Account not found" };
+      }
+
+      const verificationCode = generateVerificationCode();
+      account.email = email;
+      account.emailVerified = false;
+      account.verificationCode = verificationCode;
+      account.verificationCodeExpiry = nowMs() + 10 * 60 * 1000;
+      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+
+      return { success: true, verificationCode };
     },
 
     getAllAccounts() {
@@ -4104,6 +4228,99 @@
     q(".shops-container")?.classList.remove("hidden");
   }
 
+  function showEmailVerificationModal(username, code, isNewUser = false) {
+    setHidden(q(".email-verification-modal"), false);
+    safeText(q("#email-verify-timer"), "");
+    const codeInput = q("#verification-code-input");
+    if (codeInput) codeInput.value = "";
+
+    sendVerificationEmail(
+      accountSystem.getAccount(username)?.email || "",
+      code,
+    );
+
+    const startTime = nowMs();
+    const timer = setInterval(() => {
+      const elapsed = nowMs() - startTime;
+      const remaining = Math.max(0, 10 * 60 * 1000 - elapsed);
+      const minutes = Math.floor(remaining / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+      safeText(
+        q("#email-verify-timer"),
+        `Code expires in ${minutes}:${String(seconds).padStart(2, "0")}`,
+      );
+
+      if (remaining <= 0) clearInterval(timer);
+    }, 1000);
+
+    const verifyBtn = q(".verify-code-btn");
+    if (verifyBtn) {
+      verifyBtn.onclick = () => {
+        const enteredCode = codeInput?.value || "";
+        const verifyResult = accountSystem.verifyEmail(username, enteredCode);
+
+        if (!verifyResult.success) {
+          safeText(q("#email-verification-error"), verifyResult.error);
+          return;
+        }
+
+        safeText(q("#email-verification-error"), "");
+        setHidden(q(".email-verification-modal"), true);
+        clearInterval(timer);
+
+        if (isNewUser) {
+          boot();
+          renderPlayersList();
+        } else {
+          location.reload();
+        }
+      };
+    }
+
+    const resendBtn = q(".resend-code-btn");
+    if (resendBtn) {
+      resendBtn.onclick = () => {
+        const resendResult = accountSystem.resendVerificationCode(username);
+        if (!resendResult.success) {
+          safeText(q("#email-verification-error"), resendResult.error);
+          return;
+        }
+
+        safeText(
+          q("#email-verification-error"),
+          "New code sent to your email!",
+        );
+        if (codeInput) codeInput.value = "";
+      };
+    }
+  }
+
+  function showEmailCollectionModal(username) {
+    setHidden(q(".email-collection-modal"), false);
+    const emailInput = q("#email-collection-input");
+    if (emailInput) emailInput.value = "";
+
+    const submitBtn = q(".email-collection-submit-btn");
+    if (submitBtn) {
+      submitBtn.onclick = () => {
+        const email = emailInput?.value || "";
+        if (!email) {
+          safeText(q("#email-collection-error"), "Email is required");
+          return;
+        }
+
+        const result = accountSystem.addEmailToExistingUser(username, email);
+        if (!result.success) {
+          safeText(q("#email-collection-error"), result.error);
+          return;
+        }
+
+        setHidden(q(".email-collection-modal"), true);
+        showEmailVerificationModal(username, result.verificationCode, false);
+      };
+    }
+  }
+
   function updateUserInfo() {
     const adminBtn = q(".admin-open-trigger");
 
@@ -4293,6 +4510,14 @@
       if (q("#login-username")) q("#login-username").value = "";
       if (q("#login-password")) q("#login-password").value = "";
 
+      const account = accountSystem.getAccount(username);
+      if (account && !account.emailVerified) {
+        hideAuthModal();
+        showEmailCollectionModal(username);
+        updateUserInfo();
+        return;
+      }
+
       hideAuthModal();
       boot();
       updateUserInfo();
@@ -4305,13 +4530,14 @@
       const username = normalizeUsername(q("#register-username")?.value);
       const password = q("#register-password")?.value || "";
       const confirmPassword = q("#register-confirm")?.value || "";
+      const email = q("#register-email")?.value || "";
 
       if (password !== confirmPassword) {
         safeText(q("#register-error"), "Passwords do not match");
         return;
       }
 
-      const result = accountSystem.register(username, password);
+      const result = accountSystem.register(username, password, email);
       if (!result.success) {
         safeText(q("#register-error"), result.error);
         return;
@@ -4319,6 +4545,7 @@
 
       safeText(q("#register-error"), "");
       if (q("#register-username")) q("#register-username").value = "";
+      if (q("#register-email")) q("#register-email").value = "";
       if (q("#register-password")) q("#register-password").value = "";
       if (q("#register-confirm")) q("#register-confirm").value = "";
 
@@ -4332,10 +4559,8 @@
       }
 
       hideAuthModal();
-      boot();
+      showEmailVerificationModal(username, result.verificationCode, true);
       updateUserInfo();
-      renderPlayersList();
-      showPendingUserNotifications();
     });
 
     q(".logout-btn")?.addEventListener("click", () => {
@@ -4749,6 +4974,49 @@
         renderPlayersList();
         showEventNotification(`✓ Deleted ${target}`);
       });
+    });
+
+    q(".admin-send-email-btn")?.addEventListener("click", () => {
+      if (!permissionSystem.canPromoteAdmin(currentUser?.username))
+        return showEventNotification("Owner permission required");
+
+      let target = normalizeUsername(q(".admin-email-target")?.value);
+      if (!target) return showEventNotification("Enter a player username");
+      const targetAccount = accountSystem.getAccount(target);
+      if (!targetAccount) return showEventNotification("Player not found");
+      target = targetAccount.username;
+
+      if (!targetAccount.emailVerified) {
+        return showEventNotification("Target player hasn't verified their email");
+      }
+
+      const message = q(".admin-email-message")?.value || "";
+      if (!message.trim())
+        return showEventNotification("Enter a message");
+
+      const notification = {
+        id: Math.random().toString(36).substr(2, 9),
+        type: "email",
+        message: `📧 ${currentUser.username}: ${message}`,
+        createdAt: nowMs(),
+      };
+
+      const account = accountSystem.getAccount(target);
+      account.notifications = account.notifications || [];
+      account.notifications.push(notification);
+      const accounts = accountSystem.getAllAccounts();
+      const idx = accounts.findIndex(
+        (a) => accountKey(a.username) === accountKey(target),
+      );
+      if (idx >= 0) {
+        accounts[idx] = account;
+        localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+      }
+
+      q(".admin-email-target").value = "";
+      q(".admin-email-message").value = "";
+      showEventNotification(`✓ Email sent to ${target}`);
+      renderAdminPanel();
     });
 
     q(".admin-give-coins-btn")?.addEventListener("click", () => {

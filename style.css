@@ -1702,6 +1702,124 @@ label:focus-within {
     min-height: 16px;
 }
 
+/* ==================== EMAIL VERIFICATION MODAL ==================== */
+.email-verification-modal,
+.email-collection-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+}
+
+.email-verification-modal.hidden,
+.email-collection-modal.hidden {
+    display: none;
+}
+
+.email-verification-modal .modal-content,
+.email-collection-modal .modal-content {
+    background: var(--bg-secondary);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 40px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 0 20px var(--shadow);
+}
+
+.email-verification-modal h2,
+.email-collection-modal h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.email-verification-modal p,
+.email-collection-modal p {
+    text-align: center;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.verification-code-input {
+    padding: 12px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 18px;
+    text-align: center;
+    letter-spacing: 8px;
+    font-family: monospace;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.verification-code-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 10px var(--shadow);
+}
+
+.email-verify-actions,
+.email-collection-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.email-verify-actions button,
+.email-collection-actions button {
+    flex: 1;
+    padding: 12px;
+    background: var(--primary);
+    border: none;
+    border-radius: 6px;
+    color: var(--bg);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.email-verify-actions button:hover,
+.email-collection-actions button:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px var(--shadow);
+}
+
+.email-verify-actions .secondary-btn {
+    background: var(--warning);
+    color: var(--bg);
+}
+
+.email-verify-actions .secondary-btn:hover {
+    background: var(--secondary);
+}
+
+.verification-error,
+.email-collection-error {
+    color: var(--danger);
+    font-size: 12px;
+    text-align: center;
+    min-height: 16px;
+    margin-bottom: 10px;
+}
+
+.verification-timer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
 /* ==================== USER CONTROLS ==================== */
 .user-controls {
     display: flex;
