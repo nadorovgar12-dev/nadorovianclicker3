@@ -66,13 +66,6 @@
                             required
                         />
                         <input
-                            type="email"
-                            class="auth-input"
-                            id="register-email"
-                            placeholder="Email Address"
-                            required
-                        />
-                        <input
                             type="password"
                             class="auth-input"
                             id="register-password"
@@ -92,47 +85,6 @@
                         <div class="auth-error" id="register-error"></div>
                     </form>
                 </div>
-            </div>
-        </div>
-
-        <!-- Email Verification Modal -->
-        <div class="email-verification-modal hidden" role="dialog" aria-modal="true" aria-labelledby="email-verify-title">
-            <div class="modal-content">
-                <h2 id="email-verify-title">Verify Your Email</h2>
-                <p class="email-verify-message">Enter the 6-digit code we sent to your email</p>
-                <input
-                    type="text"
-                    class="verification-code-input"
-                    id="verification-code-input"
-                    maxlength="6"
-                    placeholder="000000"
-                    inputmode="numeric"
-                />
-                <div class="email-verify-actions">
-                    <button type="button" class="modal-button verify-code-btn">Verify Code</button>
-                    <button type="button" class="modal-button secondary-btn resend-code-btn">Resend Code</button>
-                </div>
-                <div class="verification-error" id="email-verification-error"></div>
-                <div class="verification-timer" id="email-verify-timer"></div>
-            </div>
-        </div>
-
-        <!-- Email Collection Modal (for existing users) -->
-        <div class="email-collection-modal hidden" role="dialog" aria-modal="true" aria-labelledby="email-collect-title">
-            <div class="modal-content">
-                <h2 id="email-collect-title">Update Your Email</h2>
-                <p>We need your email address to continue playing</p>
-                <input
-                    type="email"
-                    class="auth-input"
-                    id="email-collection-input"
-                    placeholder="Enter your email address"
-                    required
-                />
-                <div class="email-collection-actions">
-                    <button type="button" class="modal-button email-collection-submit-btn">Submit Email</button>
-                </div>
-                <div class="email-collection-error" id="email-collection-error"></div>
             </div>
         </div>
 
@@ -171,7 +123,7 @@
             </button>
         </nav>
 
-        <!-- Top Dashboard -->
+        <!-- Top Dashboard (Minimal) -->
         <header class="dashboard">
             <div class="stats">
                 <div class="coin-display" aria-live="polite">
@@ -185,11 +137,18 @@
                         <span class="income-rate">0</span>
                         <span class="income-label">/s</span>
                     </div>
-                    <div class="combo-display hidden">
-                        <span class="combo-label">COMBO</span>
-                        <span class="combo-count">0</span>
-                        <span class="combo-multiplier">x1</span>
-                    </div>
+                </div>
+
+                <!-- Mobile Stats (Top) -->
+                <div class="mobile-top-stats">
+                    <button class="stat-item" type="button" aria-label="Total clicks">
+                        <span class="stat-icon">👆</span>
+                        <span class="stat-value" data-stat="clicks">0</span>
+                    </button>
+                    <button class="stat-item" type="button" aria-label="Total critical hits">
+                        <span class="stat-icon">⭐</span>
+                        <span class="stat-value" data-stat="crits">0</span>
+                    </button>
                 </div>
             </div>
 
@@ -209,149 +168,131 @@
                 </button>
             </div>
 
-            <div class="buy-mode-controls" style="margin-bottom: 12px">
-                <button class="buy-mode-btn active" data-buy-mode="1">
-                    x1
-                </button>
-                <button class="buy-mode-btn" data-buy-mode="10">x10</button>
-                <button class="buy-mode-btn" data-buy-mode="25">x25</button>
-                <button class="buy-mode-btn" data-buy-mode="100">x100</button>
-                <button class="buy-mode-btn" data-buy-mode="max">MAX</button>
-            </div>
-
-            <!-- User Info & Controls -->
-            <div class="user-controls">
+            <!-- Desktop User Info -->
+            <div class="desktop-user-controls">
                 <span class="user-info-text"
                     >👤 <span class="user-name">Guest</span> (<span
                         class="user-role"
                         >Loading...</span
                     >)</span
                 >
-                <button
-                    class="stat-item players-open-trigger"
-                    type="button"
-                    title="View all players"
-                >
-                    <span class="stat-icon">👥</span>
-                    <span>Players</span>
-                </button>
-                <button
-                    class="stat-item social-open-trigger"
-                    type="button"
-                    title="Chat, gifts, and leaderboards"
-                >
-                    <span class="stat-icon">💬</span>
-                    <span>Social</span>
-                    <span class="social-unread-badge hidden">0</span>
-                </button>
-                <button
-                    class="stat-item admin-open-trigger hidden"
-                    type="button"
-                    title="Admin Panel"
-                >
-                    <span class="stat-icon">🛡️</span>
-                    <span>Admin</span>
-                </button>
                 <button class="utility-btn logout-btn" aria-label="Logout">
                     🚪 Logout
                 </button>
             </div>
-
-            <div class="quick-stats">
-                <button
-                    class="stat-item"
-                    type="button"
-                    aria-label="Total clicks"
-                >
-                    <span class="stat-icon">👆</span>
-                    <span class="stat-value" data-stat="clicks">0</span>
-                </button>
-                <button
-                    class="stat-item"
-                    type="button"
-                    aria-label="Total critical hits"
-                >
-                    <span class="stat-icon">⭐</span>
-                    <span class="stat-value" data-stat="crits">0</span>
-                </button>
-                <button
-                    class="stat-item achievements-open-trigger"
-                    type="button"
-                    aria-label="Open achievements"
-                >
-                    <span class="stat-icon">🏆</span>
-                    <span class="stat-value" data-stat="achievements">0</span>
-                </button>
-                <button
-                    class="stat-item"
-                    type="button"
-                    aria-label="Research points"
-                >
-                    <span class="stat-icon">🔬</span>
-                    <span class="stat-value" data-stat="research">0</span>
-                </button>
-                <button class="stat-item research-btn" type="button">
-                    <span class="stat-icon">📚</span>
-                    <span>Research</span>
-                </button>
-                <button class="stat-item upgrades-open-trigger" type="button">
-                    <span class="stat-icon">🧰</span>
-                    <span>Upgrades</span>
-                </button>
-                <button class="stat-item quests-open-trigger" type="button">
-                    <span class="stat-icon">🗺️</span>
-                    <span>Quests</span>
-                </button>
-                <button class="stat-item stats-open-trigger" type="button">
-                    <span class="stat-icon">📈</span>
-                    <span>Stats</span>
-                </button>
-                <button class="stat-item settings-open-trigger" type="button">
-                    <span class="stat-icon">⚙️</span>
-                    <span>Settings</span>
-                </button>
-                <button class="stat-item saves-open-trigger" type="button">
-                    <span class="stat-icon">🗂️</span>
-                    <span>Saves</span>
-                </button>
-            </div>
-
-            <div
-                class="utility-controls"
-                style="
-                    margin-top: 12px;
-                    display: flex;
-                    justify-content: center;
-                    gap: 10px;
-                    flex-wrap: wrap;
-                "
-            >
-                <button class="utility-btn save-btn" aria-label="Save game now">
-                    💾 Save
-                </button>
-                <button class="utility-btn reset-btn" aria-label="Hard reset">
-                    🧹 Reset
-                </button>
-                <button
-                    class="utility-btn sound-toggle-btn"
-                    aria-label="Toggle sound"
-                >
-                    🔊 Sound
-                </button>
-                <button
-                    class="utility-btn export-save-btn"
-                    aria-label="Export save data"
-                >
-                    📤 Export
-                </button>
-                <button
-                    class="utility-btn import-save-btn"
-                    aria-label="Import save data"
-                >
-                    📥 Import
-                </button>
-            </div>
         </header>
+
+        <!-- Desktop Left Sidebar -->
+        <nav class="desktop-sidebar" aria-label="Main navigation">
+            <button class="nav-btn buildings-nav-btn" data-panel="buildings" title="Buildings">
+                🏭
+            </button>
+            <button class="nav-btn social-nav-btn" data-panel="social" title="Social">
+                💬
+            </button>
+            <button class="nav-btn achievements-nav-btn" data-panel="achievements" title="Achievements">
+                🏆
+            </button>
+            <button class="nav-btn prestige-nav-btn" data-panel="prestige" title="Prestige">
+                ✨
+            </button>
+            <button class="nav-btn other-nav-btn" data-panel="other-menu" title="More Options">
+                ⋯
+            </button>
+        </nav>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+            <button class="nav-btn buildings-nav-btn" data-panel="buildings" aria-label="Buildings">
+                🏭
+            </button>
+            <button class="nav-btn social-nav-btn" data-panel="social" aria-label="Social">
+                💬
+            </button>
+            <button class="nav-btn achievements-nav-btn" data-panel="achievements" aria-label="Achievements">
+                🏆
+            </button>
+            <button class="nav-btn prestige-nav-btn" data-panel="prestige" aria-label="Prestige">
+                ✨
+            </button>
+            <button class="nav-btn other-nav-btn" data-panel="other-menu" aria-label="More Options">
+                ⋯
+            </button>
+        </nav>
+
+        <!-- Other Menu Modal (Mobile/Desktop) -->
+        <div class="other-menu-modal hidden" role="dialog" aria-modal="true" aria-labelledby="other-menu-title">
+            <div class="modal-content">
+                <h2 id="other-menu-title">More Options</h2>
+                <div class="other-menu-grid">
+                    <button class="menu-item research-btn" type="button">
+                        <span class="stat-icon">📚</span>
+                        <span>Research</span>
+                    </button>
+                    <button class="menu-item upgrades-open-trigger" type="button">
+                        <span class="stat-icon">🧰</span>
+                        <span>Upgrades</span>
+                    </button>
+                    <button class="menu-item quests-open-trigger" type="button">
+                        <span class="stat-icon">🗺️</span>
+                        <span>Quests</span>
+                    </button>
+                    <button class="menu-item stats-open-trigger" type="button">
+                        <span class="stat-icon">📈</span>
+                        <span>Stats</span>
+                    </button>
+                    <button class="menu-item settings-open-trigger" type="button">
+                        <span class="stat-icon">⚙️</span>
+                        <span>Settings</span>
+                    </button>
+                    <button class="menu-item saves-open-trigger" type="button">
+                        <span class="stat-icon">🗂️</span>
+                        <span>Saves</span>
+                    </button>
+                    <button class="menu-item minigames-open-trigger" type="button">
+                        <span class="stat-icon">🎮</span>
+                        <span>Games</span>
+                    </button>
+                    <button class="menu-item boss-open-trigger" type="button">
+                        <span class="stat-icon">⚔️</span>
+                        <span>Boss</span>
+                    </button>
+                    <button class="menu-item cosmetics-open-trigger" type="button">
+                        <span class="stat-icon">✨</span>
+                        <span>Skins</span>
+                    </button>
+                    <button class="menu-item players-open-trigger" type="button">
+                        <span class="stat-icon">👥</span>
+                        <span>Players</span>
+                    </button>
+                    <button class="menu-item admin-open-trigger hidden" type="button">
+                        <span class="stat-icon">🛡️</span>
+                        <span>Admin</span>
+                    </button>
+                    <button class="menu-item save-btn" type="button">
+                        <span class="stat-icon">💾</span>
+                        <span>Save</span>
+                    </button>
+                    <button class="menu-item reset-btn" type="button">
+                        <span class="stat-icon">🧹</span>
+                        <span>Reset</span>
+                    </button>
+                    <button class="menu-item sound-toggle-btn" type="button">
+                        <span class="stat-icon">🔊</span>
+                        <span>Sound</span>
+                    </button>
+                    <button class="menu-item export-save-btn" type="button">
+                        <span class="stat-icon">📤</span>
+                        <span>Export</span>
+                    </button>
+                    <button class="menu-item import-save-btn" type="button">
+                        <span class="stat-icon">📥</span>
+                        <span>Import</span>
+                    </button>
+                </div>
+                <button class="close-other-menu" aria-label="Close menu">✕</button>
+            </div>
+        </div>
 
         <!-- Notifications -->
         <div class="event-notification hidden" aria-live="polite"></div>
@@ -530,6 +471,16 @@
                             <option value="120">120</option>
                         </select>
                     </label>
+                    <fieldset class="settings-item">
+                        <legend>Theme</legend>
+                        <div class="mobile-theme-selector">
+                            <button class="theme-btn" data-theme="dark" aria-label="Dark theme">🌙</button>
+                            <button class="theme-btn" data-theme="light" aria-label="Light theme">☀️</button>
+                            <button class="theme-btn" data-theme="neon" aria-label="Neon theme">⚡</button>
+                            <button class="theme-btn" data-theme="forest" aria-label="Forest theme">🌲</button>
+                            <button class="theme-btn" data-theme="ocean" aria-label="Ocean theme">🌊</button>
+                        </div>
+                    </fieldset>
                 </div>
                 <div class="settings-actions">
                     <button class="utility-btn settings-apply-btn">
@@ -933,6 +884,68 @@
                     ✕
                 </button>
             </section>
+
+            <!-- Mini-Games Panel -->
+            <section class="minigames-panel hidden" aria-hidden="true">
+                <h2>🎮 Mini-Games</h2>
+                <div class="minigames-grid">
+                    <button class="minigame-card" data-game="rapid_tap">
+                        <span class="game-icon">⚡</span>
+                        <span class="game-name">Rapid Tap</span>
+                        <span class="game-desc">10s clicking sprint</span>
+                    </button>
+                    <button class="minigame-card" data-game="crit_hunter">
+                        <span class="game-icon">⭐</span>
+                        <span class="game-name">Crit Hunter</span>
+                        <span class="game-desc">Get 5 critical hits</span>
+                    </button>
+                    <button class="minigame-card" data-game="coin_catch">
+                        <span class="game-icon">💰</span>
+                        <span class="game-name">Coin Catch</span>
+                        <span class="game-desc">Catch falling coins</span>
+                    </button>
+                    <button class="minigame-card" data-game="lucky_spin">
+                        <span class="game-icon">🎰</span>
+                        <span class="game-name">Lucky Spin</span>
+                        <span class="game-desc">Spin for riches</span>
+                    </button>
+                </div>
+                <button class="close-minigames" aria-label="Close mini-games">✕</button>
+            </section>
+
+            <!-- Boss Battles Panel -->
+            <section class="boss-battles-panel hidden" aria-hidden="true">
+                <h2>⚔️ Boss Battles</h2>
+                <div class="boss-selection">
+                    <!-- Generated by JS -->
+                </div>
+                <div class="boss-battle-arena hidden" id="boss-arena">
+                    <div class="boss-display">
+                        <div class="boss-icon" id="boss-icon">🦝</div>
+                        <div class="boss-name" id="boss-name">Trash Panda</div>
+                        <div class="boss-health-bar">
+                            <div class="boss-health-fill" id="boss-health"></div>
+                        </div>
+                        <div class="boss-health-text" id="boss-health-text">100/100</div>
+                    </div>
+                    <button class="click-for-damage-btn" id="damage-btn">CLICK TO ATTACK! ⚔️</button>
+                    <button class="flee-battle-btn" id="flee-btn">🏃 Flee</button>
+                </div>
+                <button class="close-boss" aria-label="Close boss battles">✕</button>
+            </section>
+
+            <!-- Prestige Cosmetics Panel -->
+            <section class="cosmetics-panel hidden" aria-hidden="true">
+                <h2>✨ Prestige Cosmetics</h2>
+                <p class="cosmetics-info">Unlock special visual effects with prestige!</p>
+                <div class="cosmetics-grid">
+                    <!-- Generated by JS -->
+                </div>
+                <button class="close-cosmetics" aria-label="Close cosmetics">✕</button>
+            </section>
+
+            <!-- Funny Message Display -->
+            <div class="funny-message-display hidden" id="funny-message" aria-live="polite"></div>
         </main>
 
         <!-- Mini-Game Modal -->

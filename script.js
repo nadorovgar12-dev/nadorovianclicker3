@@ -517,6 +517,154 @@
     },
   ];
 
+  // ========================================================= 
+  // NEW FEATURE SYSTEMS
+  // =========================================================
+
+  const funnyMessages = [
+    "🔥 Faster! Faster! FASTER!",
+    "⚡ Your fingers are blazing!",
+    "😱 The coins are nervous...",
+    "👀 Steady hands you got there!",
+    "🎯 Perfect rhythm!",
+    "🚀 TO THE MOON!",
+    "💪 UNSTOPPABLE!",
+    "⭐ You're on fire!",
+    "🌪️ COIN TORNADO!",
+    "🎪 The circus has arrived!",
+    "🦾 Mechanical precision!",
+    "🔮 The coins whisper your name...",
+    "👑 Royal clicks detected!",
+    "✨ LEGENDARY TAPPER!",
+    "🎵 The rhythm continues...",
+    "🧠 Big brain energy!",
+    "🌈 Unicorn clicks enabled",
+    "🍕 Pizza time!",
+    "🎮 Speedrunner vibes",
+    "😎 Cool as ice... but HOT!",
+  ];
+
+  const buildingTooltips = {
+    0: "Gets tired after 8 hours 😴",
+    1: "Occasionally complains about pay 💭",
+    2: "Never takes breaks 🏭",
+    3: "Dreams of freedom 🤖",
+    4: "Can think... too much 🧠",
+    5: "Cools down in summer ❄️",
+    6: "Please don't ask what it does ⚛️",
+    7: "Evolving... always 🧬",
+    8: "Connects all dimensions 🌐",
+    9: "Where does it end? 🕳️",
+    10: "Dyson's masterpiece ☀️",
+    11: "Civilization tier⭐",
+    12: "NOT A CULT rift 🌀",
+    13: "Spider's web of destiny 🕸️",
+    14: "The answer to everything ⚫",
+  };
+
+  const miniGames = [
+    {
+      id: "rapid_tap",
+      name: "⚡ Rapid Tap",
+      desc: "Click as fast as you can in 10s",
+      duration: 10000,
+      reward: (clicks) => Math.floor(clicks * 50),
+    },
+    {
+      id: "crit_hunter",
+      name: "⭐ Crit Hunter",
+      desc: "Get 5 crits to win a prize",
+      target: 5,
+      reward: () => 5000,
+    },
+    {
+      id: "coin_catch",
+      name: "💰 Coin Catch",
+      desc: "Catch falling coins in 15s",
+      duration: 15000,
+      reward: (caught) => caught * 200,
+    },
+    {
+      id: "lucky_spin",
+      name: "🎰 Lucky Spin",
+      desc: "Spin for random rewards",
+      outcomes: [
+        { text: "JACKPOT! 🎉", multiplier: 10 },
+        { text: "Big Win! 💎", multiplier: 5 },
+        { text: "Nice! 🎁", multiplier: 2 },
+        { text: "Try again 😅", multiplier: 0.5 },
+      ],
+      reward: () => 1000,
+    },
+  ];
+
+  const bossBattles = [
+    {
+      id: "trash_panda",
+      name: "🦝 Trash Panda Boss",
+      icon: "🦝",
+      health: 100,
+      dmgPerClick: 1,
+      reward: 50000,
+      desc: "Steals coins constantly!",
+    },
+    {
+      id: "robo_giant",
+      name: "🤖 Robot Giant",
+      icon: "🤖",
+      health: 250,
+      dmgPerClick: 2,
+      reward: 250000,
+      desc: "Immune to logic!",
+    },
+    {
+      id: "coin_hoarder",
+      name: "🐉 Coin Hoarder Dragon",
+      icon: "🐉",
+      health: 500,
+      dmgPerClick: 3,
+      reward: 1000000,
+      desc: "Loves your coins more than you!",
+    },
+  ];
+
+  const prestigeCosmetics = [
+    {
+      id: "sparkles",
+      name: "✨ Sparkle Clicks",
+      unlockAt: 1,
+      desc: "Clicks spawn sparkles",
+      effect: "particle",
+    },
+    {
+      id: "golden",
+      name: "💛 Golden Coins",
+      unlockAt: 2,
+      desc: "Coins turn golden",
+      effect: "color",
+    },
+    {
+      id: "rainbow",
+      name: "🌈 Rainbow Effect",
+      unlockAt: 3,
+      desc: "Everything is rainbow!",
+      effect: "rainbow",
+    },
+    {
+      id: "dark_mode",
+      name: "🌙 Cosmic Dark",
+      unlockAt: 5,
+      desc: "Void aesthetic",
+      effect: "theme",
+    },
+  ];
+
+  const achievements_enhanced = achievements.map((a) => ({
+    ...a,
+    unlockedAt: null,
+    notified: false,
+  }));
+
   const upgrades = [
     // Click
     {
@@ -792,32 +940,6 @@
     );
   }
 
-  function generateVerificationCode() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  }
-
-  function validateEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
-
-  async function sendVerificationEmail(email, code) {
-    try {
-      const response = await fetch("/api/send-verification-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code }),
-      });
-      const result = await response.json();
-      return result.success || false;
-    } catch {
-      console.log(
-        `📧 Verification code for ${email}: ${code} (expires in 10 minutes)`,
-      );
-      return true;
-    }
-  }
-
   function getPlayerSaveKey(username) {
     return `${PLAYER_DATA_PREFIX}${username}`;
   }
@@ -847,10 +969,10 @@
   }
 
   const accountSystem = {
-    register(username, password, email) {
+    register(username, password) {
       const normalizedUsername = normalizeUsername(username);
-      if (!normalizedUsername || !password || !email) {
-        return { success: false, error: "Username, password, and email required" };
+      if (!normalizedUsername || !password) {
+        return { success: false, error: "Username and password required" };
       }
 
       if (normalizedUsername.length < 3) {
@@ -867,10 +989,6 @@
         };
       }
 
-      if (!validateEmail(email)) {
-        return { success: false, error: "Invalid email address" };
-      }
-
       const accounts = this.getAllAccounts();
       const exists = accounts.find(
         (a) => accountKey(a.username) === accountKey(normalizedUsername),
@@ -884,7 +1002,6 @@
         accountKey(normalizedUsername) === accountKey(OWNER_USERNAME) &&
         !ownerExists;
 
-      const verificationCode = generateVerificationCode();
       const newAccount = {
         username: normalizedUsername,
         passwordHash: hashPassword(password),
@@ -895,17 +1012,12 @@
         warnings: 0,
         notifications: [],
         kickedUntil: 0,
-        email: email,
-        emailVerified: false,
-        verificationCode: verificationCode,
-        verificationCodeExpiry: nowMs() + 10 * 60 * 1000,
-        emailVerifiedAt: null,
       };
 
       accounts.push(newAccount);
       localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
 
-      return { success: true, account: newAccount, verificationCode };
+      return { success: true, account: newAccount };
     },
 
     login(username, password) {
@@ -985,94 +1097,6 @@
       currentUser = null;
       selectedAdminPlayer = null;
       localStorage.removeItem(CURRENT_USER_KEY);
-    },
-
-    verifyEmail(username, code) {
-      const normalizedUsername = normalizeUsername(username);
-      if (!normalizedUsername || !code) {
-        return { success: false, error: "Username and code required" };
-      }
-
-      const accounts = this.getAllAccounts();
-      const account = accounts.find(
-        (a) => accountKey(a.username) === accountKey(normalizedUsername),
-      );
-
-      if (!account) {
-        return { success: false, error: "Account not found" };
-      }
-
-      if (account.emailVerified) {
-        return { success: false, error: "Email already verified" };
-      }
-
-      if (!account.verificationCode || account.verificationCode !== code) {
-        return { success: false, error: "Invalid verification code" };
-      }
-
-      if (nowMs() > Number(account.verificationCodeExpiry || 0)) {
-        return { success: false, error: "Verification code expired" };
-      }
-
-      account.emailVerified = true;
-      account.emailVerifiedAt = nowMs();
-      account.verificationCode = null;
-      account.verificationCodeExpiry = 0;
-      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
-
-      return { success: true };
-    },
-
-    resendVerificationCode(username) {
-      const normalizedUsername = normalizeUsername(username);
-      const accounts = this.getAllAccounts();
-      const account = accounts.find(
-        (a) => accountKey(a.username) === accountKey(normalizedUsername),
-      );
-
-      if (!account) {
-        return { success: false, error: "Account not found" };
-      }
-
-      if (account.emailVerified) {
-        return { success: false, error: "Email already verified" };
-      }
-
-      const newCode = generateVerificationCode();
-      account.verificationCode = newCode;
-      account.verificationCodeExpiry = nowMs() + 10 * 60 * 1000;
-      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
-
-      return { success: true, verificationCode: newCode };
-    },
-
-    addEmailToExistingUser(username, email) {
-      const normalizedUsername = normalizeUsername(username);
-      if (!normalizedUsername || !email) {
-        return { success: false, error: "Username and email required" };
-      }
-
-      if (!validateEmail(email)) {
-        return { success: false, error: "Invalid email address" };
-      }
-
-      const accounts = this.getAllAccounts();
-      const account = accounts.find(
-        (a) => accountKey(a.username) === accountKey(normalizedUsername),
-      );
-
-      if (!account) {
-        return { success: false, error: "Account not found" };
-      }
-
-      const verificationCode = generateVerificationCode();
-      account.email = email;
-      account.emailVerified = false;
-      account.verificationCode = verificationCode;
-      account.verificationCodeExpiry = nowMs() + 10 * 60 * 1000;
-      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
-
-      return { success: true, verificationCode };
     },
 
     getAllAccounts() {
@@ -3712,6 +3736,17 @@
       renderSaveSlotsMeta();
       openPanel(".save-manager-panel");
     });
+    q(".minigames-open-trigger")?.addEventListener("click", () =>
+      openPanel(".minigames-panel"),
+    );
+    q(".boss-open-trigger")?.addEventListener("click", () => {
+      renderBossSelection();
+      openPanel(".boss-battles-panel");
+    });
+    q(".cosmetics-open-trigger")?.addEventListener("click", () => {
+      renderCosmetics();
+      openPanel(".cosmetics-panel");
+    });
 
     q(".close-research")?.addEventListener("click", () =>
       closePanel(".research-tree"),
@@ -3734,6 +3769,15 @@
     q(".close-save-manager")?.addEventListener("click", () =>
       closePanel(".save-manager-panel"),
     );
+    q(".close-minigames")?.addEventListener("click", () =>
+      closePanel(".minigames-panel"),
+    );
+    q(".close-boss")?.addEventListener("click", () =>
+      closePanel(".boss-battles-panel"),
+    );
+    q(".close-cosmetics")?.addEventListener("click", () =>
+      closePanel(".cosmetics-panel"),
+    );
     q(".close-pet-panel")?.addEventListener("click", () =>
       closePanel(".pet-panel"),
     );
@@ -3745,8 +3789,160 @@
     );
   }
 
+  // ========================================================= 
+  // NEW FEATURE FUNCTIONS
+  // =========================================================
+
+  function showFunnyMessage() {
+    const msg = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+    const el = q("#funny-message");
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.remove("hidden", "fade-out");
+    setTimeout(() => {
+      el.classList.add("fade-out");
+      setTimeout(() => el.classList.add("hidden"), 600);
+    }, 2000);
+  }
+
+  function renderBossSelection() {
+    const container = q(".boss-selection");
+    if (!container) return;
+    container.innerHTML = bossBattles
+      .map(
+        (boss) => `
+      <button class="boss-card" data-boss="${boss.id}">
+        <div class="boss-icon-small">${boss.icon}</div>
+        <div class="boss-name-small">${boss.name}</div>
+        <div class="boss-reward">${formatNumber(boss.reward)} 🪙</div>
+      </button>
+    `,
+      )
+      .join("");
+    qa(".boss-card").forEach((btn) => {
+      btn.addEventListener("click", () => startBossBattle(btn.dataset.boss));
+    });
+  }
+
+  function startBossBattle(bossId) {
+    const boss = bossBattles.find((b) => b.id === bossId);
+    if (!boss) return;
+    gameState.currentBoss = { ...boss, currentHealth: boss.health };
+    q(".boss-selection").classList.add("hidden");
+    q("#boss-arena").classList.remove("hidden");
+    updateBossDisplay();
+    q("#damage-btn").addEventListener("click", attackBoss);
+    q("#flee-btn").addEventListener("click", fleeBattle);
+  }
+
+  function attackBoss() {
+    const boss = gameState.currentBoss;
+    if (!boss) return;
+    boss.currentHealth -= boss.dmgPerClick;
+    updateBossDisplay();
+    if (boss.currentHealth <= 0) {
+      winBossBattle();
+    }
+  }
+
+  function updateBossDisplay() {
+    const boss = gameState.currentBoss;
+    if (!boss) return;
+    q("#boss-icon").textContent = boss.icon;
+    q("#boss-name").textContent = boss.name;
+    const healthPercent = Math.max(0, (boss.currentHealth / boss.health) * 100);
+    q("#boss-health").style.width = healthPercent + "%";
+    q("#boss-health-text").textContent = `${boss.currentHealth}/${boss.health}`;
+  }
+
+  function winBossBattle() {
+    const boss = gameState.currentBoss;
+    gameState.coins += boss.reward;
+    createConfetti(50);
+    showEventNotification(`⚔️ VICTORY! Won ${formatNumber(boss.reward)} coins!`);
+    fleeBattle();
+  }
+
+  function fleeBattle() {
+    gameState.currentBoss = null;
+    q("#boss-arena").classList.add("hidden");
+    q(".boss-selection").classList.remove("hidden");
+    q("#damage-btn").replaceWith(q("#damage-btn").cloneNode(true));
+    q("#flee-btn").replaceWith(q("#flee-btn").cloneNode(true));
+  }
+
+  function renderCosmetics() {
+    const container = q(".cosmetics-grid");
+    if (!container) return;
+    container.innerHTML = prestigeCosmetics
+      .map((cosmetic) => {
+        const unlocked = gameState.prestigeLevel >= cosmetic.unlockAt;
+        return `
+        <div class="cosmetic-card ${unlocked ? "unlocked" : "locked"}">
+          <div class="cosmetic-icon">${cosmetic.id === "sparkles" ? "✨" : cosmetic.id === "golden" ? "💛" : cosmetic.id === "rainbow" ? "🌈" : "🌙"}</div>
+          <div class="cosmetic-name">${cosmetic.name}</div>
+          <div class="cosmetic-tier">Prestige ${cosmetic.unlockAt}</div>
+          ${unlocked ? '<div class="cosmetic-unlock">✓ Unlocked!</div>' : ""}
+        </div>
+      `;
+      })
+      .join("");
+  }
+
+  function bindMiniGames() {
+    qa(".minigame-card").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const gameId = btn.dataset.game;
+        startMiniGame(gameId);
+      });
+    });
+  }
+
+  function startMiniGame(gameId) {
+    const game = miniGames.find((g) => g.id === gameId);
+    if (!game) return;
+    
+    if (gameId === "rapid_tap") {
+      startRapidTap(game);
+    } else if (gameId === "lucky_spin") {
+      startLuckySpin(game);
+    } else {
+      showEventNotification(`🎮 ${game.name} coming soon!`);
+    }
+  }
+
+  function startRapidTap(game) {
+    let clicks = 0;
+    const startTime = perfNow();
+    showEventNotification(`⚡ TAP FAST! You have ${game.duration / 1000}s!`);
+    
+    const handler = () => {
+      clicks++;
+      createConfetti(5);
+    };
+    q(".main-button")?.addEventListener("click", handler);
+    
+    setTimeout(() => {
+      q(".main-button")?.removeEventListener("click", handler);
+      const reward = game.reward(clicks);
+      gameState.coins += reward;
+      createConfetti(30);
+      showEventNotification(`🎮 Rapid Tap Complete! Got ${clicks} clicks!\nEarned ${formatNumber(reward)} coins!`);
+    }, game.duration);
+  }
+
+  function startLuckySpin(game) {
+    const outcomes = game.outcomes;
+    const outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
+    const reward = Math.floor(game.reward() * outcome.multiplier);
+    gameState.coins += reward;
+    createConfetti(40);
+    showEventNotification(`🎰 ${outcome.text}\nWon ${formatNumber(reward)} coins!`);
+  }
+
   function bindCoreButtons() {
     q(".main-button")?.addEventListener("click", () => {
+      if (Math.random() < 0.15) showFunnyMessage();
       const crit = calculateCrit();
       const comboMul = 1 + gameState.combo * 0.04 * gameState.comboBoost;
       const amount =
@@ -4159,6 +4355,7 @@
 
     bindPanelButtons();
     bindCoreButtons();
+    bindMiniGames();
     bindKeyboardShortcuts();
 
     renderAll(true);
@@ -4195,11 +4392,54 @@
     startLoop();
   }
 
+  function setupNavigationHandlers() {
+    // Navigation button handlers
+    const navButtons = document.querySelectorAll("[data-panel]");
+    navButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const panel = btn.getAttribute("data-panel");
+        if (panel === "other-menu") {
+          q(".other-menu-modal")?.classList.remove("hidden");
+        } else if (panel === "buildings") {
+          // Buildings is default view, just hide other panels
+          closeAllPanels();
+        } else if (panel === "social") {
+          q(".social-open-trigger")?.click();
+        } else if (panel === "achievements") {
+          q(".achievements-open-trigger")?.click();
+        } else if (panel === "prestige") {
+          if (q(".prestige-button")) q(".prestige-button")?.click();
+        }
+      });
+    });
+
+    // Close other menu
+    q(".close-other-menu")?.addEventListener("click", () => {
+      q(".other-menu-modal")?.classList.add("hidden");
+    });
+
+    // Click outside to close other menu
+    q(".other-menu-modal")?.addEventListener("click", (e) => {
+      if (e.target === q(".other-menu-modal")) {
+        q(".other-menu-modal")?.classList.add("hidden");
+      }
+    });
+  }
+
+  function closeAllPanels() {
+    document.querySelectorAll("[aria-hidden='true']").forEach((el) => {
+      if (!el.classList.contains("hidden") && el !== q(".other-menu-modal")) {
+        el.classList.add("hidden");
+      }
+    });
+  }
+
   function initApp() {
     setupAuthHandlers();
     setupPlayerListHandlers();
     setupSocialHandlers();
     setupAdminHandlers();
+    setupNavigationHandlers();
 
     const restored = accountSystem.restoreSession();
     if (restored) {
@@ -4226,99 +4466,6 @@
     setHidden(q(".auth-modal"), true);
     q(".dashboard")?.classList.remove("hidden");
     q(".shops-container")?.classList.remove("hidden");
-  }
-
-  function showEmailVerificationModal(username, code, isNewUser = false) {
-    setHidden(q(".email-verification-modal"), false);
-    safeText(q("#email-verify-timer"), "");
-    const codeInput = q("#verification-code-input");
-    if (codeInput) codeInput.value = "";
-
-    sendVerificationEmail(
-      accountSystem.getAccount(username)?.email || "",
-      code,
-    );
-
-    const startTime = nowMs();
-    const timer = setInterval(() => {
-      const elapsed = nowMs() - startTime;
-      const remaining = Math.max(0, 10 * 60 * 1000 - elapsed);
-      const minutes = Math.floor(remaining / 60000);
-      const seconds = Math.floor((remaining % 60000) / 1000);
-      safeText(
-        q("#email-verify-timer"),
-        `Code expires in ${minutes}:${String(seconds).padStart(2, "0")}`,
-      );
-
-      if (remaining <= 0) clearInterval(timer);
-    }, 1000);
-
-    const verifyBtn = q(".verify-code-btn");
-    if (verifyBtn) {
-      verifyBtn.onclick = () => {
-        const enteredCode = codeInput?.value || "";
-        const verifyResult = accountSystem.verifyEmail(username, enteredCode);
-
-        if (!verifyResult.success) {
-          safeText(q("#email-verification-error"), verifyResult.error);
-          return;
-        }
-
-        safeText(q("#email-verification-error"), "");
-        setHidden(q(".email-verification-modal"), true);
-        clearInterval(timer);
-
-        if (isNewUser) {
-          boot();
-          renderPlayersList();
-        } else {
-          location.reload();
-        }
-      };
-    }
-
-    const resendBtn = q(".resend-code-btn");
-    if (resendBtn) {
-      resendBtn.onclick = () => {
-        const resendResult = accountSystem.resendVerificationCode(username);
-        if (!resendResult.success) {
-          safeText(q("#email-verification-error"), resendResult.error);
-          return;
-        }
-
-        safeText(
-          q("#email-verification-error"),
-          "New code sent to your email!",
-        );
-        if (codeInput) codeInput.value = "";
-      };
-    }
-  }
-
-  function showEmailCollectionModal(username) {
-    setHidden(q(".email-collection-modal"), false);
-    const emailInput = q("#email-collection-input");
-    if (emailInput) emailInput.value = "";
-
-    const submitBtn = q(".email-collection-submit-btn");
-    if (submitBtn) {
-      submitBtn.onclick = () => {
-        const email = emailInput?.value || "";
-        if (!email) {
-          safeText(q("#email-collection-error"), "Email is required");
-          return;
-        }
-
-        const result = accountSystem.addEmailToExistingUser(username, email);
-        if (!result.success) {
-          safeText(q("#email-collection-error"), result.error);
-          return;
-        }
-
-        setHidden(q(".email-collection-modal"), true);
-        showEmailVerificationModal(username, result.verificationCode, false);
-      };
-    }
   }
 
   function updateUserInfo() {
@@ -4510,14 +4657,6 @@
       if (q("#login-username")) q("#login-username").value = "";
       if (q("#login-password")) q("#login-password").value = "";
 
-      const account = accountSystem.getAccount(username);
-      if (account && !account.emailVerified) {
-        hideAuthModal();
-        showEmailCollectionModal(username);
-        updateUserInfo();
-        return;
-      }
-
       hideAuthModal();
       boot();
       updateUserInfo();
@@ -4530,14 +4669,13 @@
       const username = normalizeUsername(q("#register-username")?.value);
       const password = q("#register-password")?.value || "";
       const confirmPassword = q("#register-confirm")?.value || "";
-      const email = q("#register-email")?.value || "";
 
       if (password !== confirmPassword) {
         safeText(q("#register-error"), "Passwords do not match");
         return;
       }
 
-      const result = accountSystem.register(username, password, email);
+      const result = accountSystem.register(username, password);
       if (!result.success) {
         safeText(q("#register-error"), result.error);
         return;
@@ -4545,7 +4683,6 @@
 
       safeText(q("#register-error"), "");
       if (q("#register-username")) q("#register-username").value = "";
-      if (q("#register-email")) q("#register-email").value = "";
       if (q("#register-password")) q("#register-password").value = "";
       if (q("#register-confirm")) q("#register-confirm").value = "";
 
@@ -4559,8 +4696,10 @@
       }
 
       hideAuthModal();
-      showEmailVerificationModal(username, result.verificationCode, true);
+      boot();
       updateUserInfo();
+      renderPlayersList();
+      showPendingUserNotifications();
     });
 
     q(".logout-btn")?.addEventListener("click", () => {
@@ -4985,10 +5124,6 @@
       const targetAccount = accountSystem.getAccount(target);
       if (!targetAccount) return showEventNotification("Player not found");
       target = targetAccount.username;
-
-      if (!targetAccount.emailVerified) {
-        return showEventNotification("Target player hasn't verified their email");
-      }
 
       const message = q(".admin-email-message")?.value || "";
       if (!message.trim())
